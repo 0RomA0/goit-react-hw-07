@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    flex: 1;
 }
 
 .text {
@@ -9,7 +10,10 @@
     font-size: 16px;
     font-weight: 700;
     color: #2c3e50;
-    width: 164px;
+    width: 100%; /* Забезпечує максимальну ширину контейнера */
+    word-break: break-word; /* Розрив слова при необхідності */
+    overflow-wrap: break-word; /* Переносить довгі слова або email-и */
+    white-space: normal; /* Дозволяє перенос тексту */
 }
 
 .btn {
@@ -32,4 +36,16 @@
     background-color: #8850f0;
     color: white;
     border: none;
+}
+
+
+.error {
+    color: #d8000c;
+    background-color: #ffbaba;
+    padding: 5px;
+    border: 1px solid #d8000c;
+    border-radius: 6px;
+    font-size: 16px;
+    margin: 10px 0;
+    font-weight: 500;
 }

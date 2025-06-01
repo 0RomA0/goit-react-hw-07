@@ -1,26 +1,32 @@
 import { Formik, Form, Field,  ErrorMessage } from "formik";
-import { useId } from "react";
-import { nanoid } from 'nanoid'
+import { useId, useState } from "react";
 import * as Yup from "yup";
 import style from "./ContactForm.module.css"
 
-import { useDispatch } from "react-redux";
-import { addContact } from "../../redux/contactsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addContact } from "../../redux/contactsOps";
+import { selectError, selectIsLoading } from "../../redux/contactsSlice";
+
 
 export default function ContactForm() {
 
+    const loading = useSelector(selectIsLoading);
+    const error = useSelector(selectError);   
+    
     const dispatch = useDispatch();
+
+    const [isAdding, setIsAdding] = useState(false);
 
 
     const FeedbackMessage = Yup.object().shape({
-        username: Yup.string().min(3, "Too Short!").max(50, "Too Long!").required("Required"),
+        name: Yup.string().min(3, "Too Short!").max(50, "Too Long!").required("Required"),
         number: Yup.string().matches(/^\d{3}-\d{2}-\d{2}$/, "Invalid format (e.g. 123-45-67)").required("Phone number is required")
 
     });
 
 
     const initialValues = {
-        username: "",
+        name: "",
         number: ""
     };
    
@@ -29,8 +35,13 @@ export default function ContactForm() {
     
 
     const handleSubmit = (values, actions) => {
-        dispatch(addContact({ id: nanoid(), name: values.username, number: values.number }));
+        setIsAdding(true);
+        dispatch(addContact(values)).unwrap()
+            .finally(() =>
+        {
+            setIsAdding(false)
             actions.resetForm();
+         });
         };
 
 return (
@@ -41,8 +52,8 @@ return (
             <div className={style.divContainer}>
 
             <label htmlFor={nameFieldId}> Name </label>
-            <Field className={style.input} type="text" name="username" />
-            <ErrorMessage className={style.errorMessage} name="username" component="span" />
+            <Field className={style.input} type="text" name="name" />
+            <ErrorMessage className={style.errorMessage} name="name" component="span" />
 
             </div>
             
@@ -55,7 +66,8 @@ return (
                 
             </div>
 
-            <button className={style.btn} type="submit"> Add contact </button>
+            <button className={style.btn} type="submit"> {loading && isAdding ? "Adding..." : "Add contact"} </button>
+            {error && <p className={style.ErrorMessage}>Failed to add contact: {error}</p>}
         </Form>
         
     </Formik>
